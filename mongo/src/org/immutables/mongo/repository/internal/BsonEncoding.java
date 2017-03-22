@@ -317,6 +317,7 @@ public final class BsonEncoding {
       return list.size();
     }
 
+
     @Override
     public Object put(String key, Object v) {
       throw new UnsupportedOperationException();
