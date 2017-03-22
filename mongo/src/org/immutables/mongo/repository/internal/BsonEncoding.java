@@ -43,12 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.Nullable;
 import org.bson.BSONCallback;
 import org.bson.BSONObject;
@@ -259,7 +254,7 @@ public final class BsonEncoding {
     }
   }
 
-  private static class InsertObjectList<T> implements DBObject, List<DBObject>, WritableObjectPosition {
+  static class InsertObjectList<T> implements DBObject, List<DBObject>, WritableObjectPosition {
     private final ImmutableList<T> list;
     private int position;
     @Nullable
@@ -420,13 +415,34 @@ public final class BsonEncoding {
 
     @Override
     public boolean isEmpty() {
-      return false;
+      return list.isEmpty();
     }
 
     @Override
     public Iterator<DBObject> iterator() {
-      return ImmutableSet.<DBObject>of().iterator();
+      return new Iterator<DBObject>() {
+        private int position = 0;
+        @Override
+        public boolean hasNext() {
+          return position < size();
+        }
+
+        @Override
+        public DBObject next() {
+          if (!hasNext()) {
+             throw new NoSuchElementException("After index: " + position);
+          }
+
+          return get(position++);
+        }
+
+        @Override
+        public void remove() {
+           throw new UnsupportedOperationException();
+        }
+      };
     }
+
 
     @Override
     public int lastIndexOf(Object o) {
